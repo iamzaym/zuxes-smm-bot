@@ -1,7 +1,22 @@
 import telebot
 import requests
+from flask import Flask
+from threading import Thread
 
-# Tomar information (Ami ready kore diechi)
+# Flask অ্যাপ তৈরি (Render এর পোর্ট স্ক্যান শান্ত করার জন্য)
+app = Flask('')
+
+@app.route('/')
+def home():
+    return "Zuxes SMM Bot is Running!"
+
+def run_flask():
+    # Render অটোমেটিক $PORT এনভায়রনমেন্ট ভ্যারিয়েবল দেয়, না থাকলে ডামি ৮০৮০ পোর্ট নেবে
+    import os
+    port = int(os.environ.get("PORT", 8080))
+    app.run(host='0.0.0.0', port=port)
+
+# তোমার ইনফরমেশন
 BOT_TOKEN = '8650628100:AAHBaAmEq9uNEKlTigpIrTltf9Y6Q0hA6DA'
 ADMIN_CHAT_ID = 7681403289  
 MOTHERPANEL_API_KEY = '460733468183c2d213b961756f65935d' 
@@ -15,7 +30,7 @@ user_orders = {}
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
     welcome_text = (
-        "👋 **Zuxes SMM বটে আপনাকে স্বাগতম!**\n\n"
+        "👋 **Zuxes SMM বটে আপনাকে स्वागतম!**\n\n"
         "আমাদের সার্ভিসগুলো এবং তাদের আইডি নিচে দেওয়া হলো:\n"
         "━━━━━━━━━━━━━━━━━━━━\n"
         "🆔 **Service ID: 1** -> 1000 Facebook Followers [Price: 100 Taka]\n"
@@ -107,4 +122,8 @@ def approve_order(message):
         except Exception as e:
             bot.send_message(ADMIN_CHAT_ID, f"❌ ভুল কমান্ড বা এরর: {str(e)}")
 
-bot.infinity_polling()
+# মেইন ফাংশন রান করার আগে ডামি ওয়েব সার্ভারকে আলাদা থ্রেডে চালু করা
+if __name__ == "__main__":
+    t = Thread(target=run_flask)
+    t.start()
+    bot.infinity_polling()
